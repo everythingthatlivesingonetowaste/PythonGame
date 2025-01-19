@@ -7,6 +7,7 @@ class Player(pygame.sprite.Sprite):
 	def __init__(self, pos, groups, collision_sprites, semi_collision_sprites):
 		super().__init__(groups)
 		self.image = pygame.image.load(join('..', 'graphics', 'player', 'idle', '0.png'))
+		self.z = Z_LAYERS['main']
 		self.rect = self.image.get_frect(topleft = pos)
 		self.hitbox_rect = self.rect.inflate(-76, -36)
 		self.old_rect = self.hitbox_rect.copy()
@@ -26,7 +27,7 @@ class Player(pygame.sprite.Sprite):
 		self.timers = {
 			'wall jump': Timer(400),
 			'wall slide block': Timer(250),
-			'platform skip': Timer(300)
+			'platform skip': Timer(100)
 		}
 
 	def input(self):
@@ -129,4 +130,3 @@ class Player(pygame.sprite.Sprite):
 		self.move(dt)
 		self.platform_move(dt)
 		self.check_contact()
-		print(self.on_surface)
