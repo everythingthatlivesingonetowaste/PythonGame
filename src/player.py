@@ -4,7 +4,7 @@ from settings import *
 from timer import Timer
 
 class Player(pygame.sprite.Sprite):
-	def __init__(self, pos, groups, collision_sprites):
+	def __init__(self, pos, groups, collision_sprites, semi_collision_sprites):
 		super().__init__(groups)
 		self.image = pygame.Surface((48,56))
 		self.image.fill('red')
@@ -19,6 +19,7 @@ class Player(pygame.sprite.Sprite):
 		self.jump_height = 500
 
 		self.collision_sprites = collision_sprites
+		self.semi_collision_sprites = semi_collision_sprites
 		self.on_surface = {'floor': False, 'left': False, 'right': False}
 		self.platform = None
 
@@ -56,12 +57,14 @@ class Player(pygame.sprite.Sprite):
 			if self.on_surface['floor']:
 				self.direction.y = -self.jump_height
 				self.timers['wall slide block'].activate()
+				self.rect.bottom -= 1
 			elif any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall slide block'].active:
 				self.timers['wall jump'].activate()
 				self.direction.y = -self.jump_height
 				self.direction.x = 1 if self.on_surface['left'] else -1
 			self.jump = False
 		self.collision('vertical')
+		self.semi_collision()
 
 	def platform_move(self, dt):
 		if self.platform:
@@ -88,16 +91,25 @@ class Player(pygame.sprite.Sprite):
 		for sprite in self.collision_sprites:
 			if sprite.rect.colliderect(self.rect):
 				if axis == 'horizontal':
-					if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
+					if self.rect.left <= sprite.rect.right and int(self.old_rect.left) >= sprite.old_rect.right:
 						self.rect.left = sprite.rect.right
-					if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
+					if self.rect.right >= sprite.rect.left and int(self.old_rect.right) <= sprite.old_rect.left:
 						self.rect.right = sprite.rect.left
 				else:
-					if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
+					if self.rect.top <= sprite.rect.bottom and int(self.old_rect.top) >= sprite.old_rect.bottom:
 						self.rect.top = sprite.rect.bottom
-					if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
+						if hasattr(sprite, 'moving'):
+							self.rect.top += 6
+					if self.rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= sprite.old_rect.top:
 						self.rect.bottom = sprite.rect.top
 					self.direction.y = 0
+
+	def semi_collision(self):
+		for sprite in self.semi_collision_sprites:
+			if sprite.rect.colliderect(self.rect):
+				if self.rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= sprite.old_rect.top:
+					self.rect.bottom = sprite.rect.top
+
 	def update_timers(self):
 		for timer in self.timers.values():
 			timer.update()
