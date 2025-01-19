@@ -21,7 +21,7 @@ class Level:
 		for obj in tmx_map.get_layer_by_name('Objects'):
 			if obj.name == 'player':
 				Player((obj.x, obj.y), self.all_sprites, self.collision_sprites, self.semi_collision_sprites)
-		#mv objects
+		#moving objects
 		for obj in tmx_map.get_layer_by_name('Moving Objects'):
 			if obj.name == 'helicopter':
 				if obj.width > obj.height:
