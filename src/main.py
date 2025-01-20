@@ -35,6 +35,7 @@ class Game:
 			'spike': import_image('..', 'graphics', 'enemies', 'spike_ball', 'Spiked Ball'),
 			'spike_chain': import_image('..', 'graphics', 'enemies', 'spike_ball', 'spiked_chain'),
 			'tooth': import_folder('..', 'graphics', 'enemies', 'tooth', 'run'),
+			'shell': import_sub_folders('..', 'graphics', 'enemies', 'shell'),
 		}
 		print(self.level_frames['player'])
 

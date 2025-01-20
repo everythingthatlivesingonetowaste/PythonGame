@@ -35,5 +35,32 @@ class Tooth(pygame.sprite.Sprite):
             self.direction *= -1
 
 class Shell(pygame.sprite.Sprite):
-    def __init__(self, pos, frames, groups):
-        
+    def __init__(self, pos, frames, groups, reverse, player):
+        super().__init__(groups)
+
+        if reverse:
+            self.frames = {}
+            for key, surfs in frames.items():
+                self.frames[key] = [pygame.transform.flip(surf,True, False) for surf in surfs]
+            self.bullet_direction = -1
+        else:
+            self.frames = frames
+            self.bullet_direction = -1
+
+        self.frame_index = 0
+        self.state = 'idle'
+        self.image = self.frames[self.state][self.frame_index]
+        self.rect = self.image.get_frect(topleft = pos)
+        self.old_rect = self.rect.copy()
+        self.z = Z_LAYERS['main']
+        self.player = player
+
+    def state_management(self):
+        player_pos, shell_pos = vector(self.player.hitbox_rect.center), vector(self.rect.center)
+        player_near = shell_pos.distance_to(player_pos) < 500
+
+        if player_near:
+            print('player is near')
+
+    def update(self, dt):
+        self.state_management()
