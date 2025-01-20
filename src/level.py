@@ -113,8 +113,21 @@ class Level:
 	def create_pearl(self, pos, direction):
 		Pearl(pos, (self.all_sprites, self.damage_sprites, self.pearl_sprites), self.pearl_surf, direction, 150)
 
+	def pearl_collision(self):
+		for sprite in self.collision_sprites:
+			pygame.sprite.spritecollide(sprite, self.pearl_sprites, True)
+
+	def hit_collision(self):
+		for sprite in self.collision_sprites:
+			if sprite.rect.colliderect(self.player.hitbox_rect):
+				print('player damage')
+				if hasattr(sprite, 'pearl'):
+					sprite.kill()
+
 
 	def run(self, dt):
 		self.display_surface.fill('black')
 		self.all_sprites.update(dt)
+		self.pearl_collision()
+		self.hit_collision()
 		self.all_sprites.draw(self.player.hitbox_rect.center)
